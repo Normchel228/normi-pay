@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Магазин - Главная</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .menu-item {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px 20px;
+            text-decoration: none;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 2px solid transparent;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        .menu-icon {
+            font-size: 32px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            flex-shrink: 0;
+        }
+
+        .menu-text {
+            flex: 1;
+        }
+
+        .menu-text h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .menu-text p {
+            font-size: 14px;
+            color: #666;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .menu-item:hover .menu-text p {
+            opacity: 1;
+        }
+
+        /* Цвета для иконок */
+        .products { background: #ff6b6b; color: white; }
+        .communication { background: #4ecdc4; color: white; }
+        .support { background: #45b7d1; color: white; }
+        .cart { background: #96ceb4; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Добро пожаловать! 👋</h1>
+            <p>Выберите действие</p>
+        </div>
+
+        <div class="menu-grid">
+            <a href="#" class="menu-item" onclick="openSection('products')">
+                <div class="menu-icon products">🛍️</div>
+                <div class="menu-text">
+                    <h3>Товары</h3>
+                    <p>Посмотреть каталог товаров</p>
+                </div>
+            </a>
+
+            <a href="#" class="menu-item" onclick="openSection('communication')">
+                <div class="menu-icon communication">💻</div>
+                <div class="menu-text">
+                    <h3>Коммуникации</h3>
+                    <p>Связь с сообществом</p>
+                </div>
+            </a>
+
+            <a href="#" class="menu-item" onclick="openSection('support')">
+                <div class="menu-icon support">❓</div>
+                <div class="menu-text">
+                    <h3>Поддержка</h3>
+                    <p>Помощь и консультация</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
