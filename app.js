@@ -1,30 +1,76 @@
-// Инициализация Telegram Web App
+// Основной файл приложения
 let tg = Telegram.WebApp;
+let currentUser = null;
 
-// Инициализируем приложение
+// Инициализация приложения
 tg.ready();
-tg.expand(); // Раскрываем на весь экран
+tg.expand();
 
-// Функция для открытия разных разделов
+// Получаем информацию о пользователе
+if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+    currentUser = tg.initDataUnsafe.user;
+    updateGreeting();
+}
+
+// Функция для обновления приветствия
+function updateGreeting() {
+    if (currentUser) {
+        const greetingElement = document.getElementById('greeting');
+        if (greetingElement) {
+            greetingElement.textContent = `Привет, ${currentUser.first_name}! 👋`;
+        }
+    }
+}
+
+// Функции для навигации
 function openSection(section) {
     switch(section) {
         case 'products':
-            showAlert('🛍️ Открываем раздел "Товары"');
-            // Здесь будет переход к каталогу товаров
+            window.location.href = 'products.html';
             break;
         case 'communication':
-            showAlert('💻 Открываем раздел "Коммуникации"');
-            // Здесь будет переход к чатам/сообществу
+            window.location.href = 'communication.html';
             break;
         case 'support':
-            showAlert('❓ Открываем раздел "Поддержка"');
-            // Здесь будет переход в поддержку
+            window.location.href = 'support.html';
             break;
     }
 }
 
-// Функция для показа уведомлений (временная)
-function showAlert(message) {
+function openAdminChat() {
+    tg.showAlert('💬 Чат с админом будет доступен после оформления заказа');
+}
+
+function showAdminChatButton() {
+    const adminChatItem = document.getElementById('adminChatItem');
+    if (adminChatItem) {
+        adminChatItem.classList.remove('hidden');
+    }
+}
+
+// Система админов
+const ADMIN_CODES = {
+    'Normiadmin': { rank: 'normilist', name: 'Нормилист' },
+    'Admin50': { rank: 'senior', name: 'Старший админ' },
+    'Admin4': { rank: 'junior', name: 'Младший админ' }
+};
+
+function checkAdminAccess(code) {
+    return ADMIN_CODES[code] || null;
+}
+
+// Сохраняем данные в localStorage
+function saveToStorage(key, data) {
+    localStorage.setItem(key, JSON.stringify(data));
+}
+
+function getFromStorage(key) {
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : null;
+}
+
+// Утилиты для работы с Telegram
+function showNotification(message) {
     if (tg.showAlert) {
         tg.showAlert(message);
     } else {
@@ -32,22 +78,13 @@ function showAlert(message) {
     }
 }
 
-// Получаем информацию о пользователе
-let user = tg.initDataUnsafe.user;
-if (user) {
-    // Можно персонализировать приветствие
-    let greetingElement = document.querySelector('.header h1');
-    if (greetingElement) {
-        greetingElement.textContent = `Привет, ${user.first_name}! 👋`;
+// Обновляем тему Telegram
+function updateTheme() {
+    const themeParams = tg.themeParams;
+    if (themeParams.bg_color) {
+        document.body.style.setProperty('--bg-color', `#${themeParams.bg_color}`);
     }
 }
 
-// Меняем цветовую схему под тему Telegram
-function updateTheme() {
-    document.documentElement.style.setProperty('--bg-color', tg.themeParams.bg_color || '#667eea');
-    document.documentElement.style.setProperty('--text-color', tg.themeParams.text_color || '#000000');
-}
-
-// Слушаем изменения темы
 tg.onEvent('themeChanged', updateTheme);
 updateTheme();
