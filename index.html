@@ -1945,4 +1945,97 @@
             }
         }
 
-        function showShopInfo
+        function showShopInfo() {
+            showNotification(`🏪 NormiShop\n💰 Курс: 1 рубль = ${EXCHANGE_RATES.RUB_TO_ROBUX} робукса\n🌟 Лучший магазин робуксов и товаров\n📞 Поддержка 24/7\n⭐ Более 1000 довольных клиентов`);
+        }
+
+        function saveData() {
+            localStorage.setItem('normishop_products', JSON.stringify(products));
+            localStorage.setItem('normishop_reviews', JSON.stringify(reviews));
+            localStorage.setItem('normishop_chat', JSON.stringify(chatMessages));
+            localStorage.setItem('normishop_codes', JSON.stringify(productCodes));
+            localStorage.setItem('normishop_orders', JSON.stringify(orders));
+            localStorage.setItem('normishop_suggestions', JSON.stringify(suggestions));
+        }
+
+        function loadData() {
+            const savedProducts = localStorage.getItem('normishop_products');
+            const savedReviews = localStorage.getItem('normishop_reviews');
+            const savedChat = localStorage.getItem('normishop_chat');
+            const savedCodes = localStorage.getItem('normishop_codes');
+            const savedOrders = localStorage.getItem('normishop_orders');
+            const savedSuggestions = localStorage.getItem('normishop_suggestions');
+            
+            products = savedProducts ? JSON.parse(savedProducts) : [];
+            reviews = savedReviews ? JSON.parse(savedReviews) : [];
+            chatMessages = savedChat ? JSON.parse(savedChat) : [
+                { type: 'system', text: 'Добро пожаловать в чат поддержки!' },
+                { sender: 'admin', text: 'Здравствуйте! Чем могу помочь?' }
+            ];
+            productCodes = savedCodes ? JSON.parse(savedCodes) : [];
+            orders = savedOrders ? JSON.parse(savedOrders) : [];
+            suggestions = savedSuggestions ? JSON.parse(savedSuggestions) : [];
+            
+            // Добавляем демо данные если пусто
+            if (products.length === 0) {
+                products = [
+                    {
+                        id: 1,
+                        name: 'Roblox Premium',
+                        description: 'Премиум подписка на 1 месяц',
+                        price: 299,
+                        currency: 'RUB',
+                        suggestedBy: 'Нормилист',
+                        editedBy: 'Нормилист'
+                    },
+                    {
+                        id: 2,
+                        name: '1000 Robux',
+                        description: 'Игровая валюта для Roblox',
+                        price: 870,
+                        currency: 'RUB',
+                        suggestedBy: 'Нормилист',
+                        editedBy: 'Нормилист'
+                    }
+                ];
+                saveData();
+            }
+        }
+
+        // ==================== ЗАГЛУШКИ ====================
+        function showSection(sectionId) {
+            const sections = {
+                'supportChats': '💬 Прошлые чаты',
+                'enterProductCode': '🔢 Ввести код товара'
+            };
+            
+            if (sections[sectionId]) {
+                showNotification(`${sections[sectionId]} - функция доступна в других разделах`);
+                return;
+            }
+            
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            
+            if (sectionId === 'viewReviews') loadReviews();
+            if (sectionId === 'buyRobux') calculateRobuxPrice();
+            if (sectionId === 'productsList') showProducts();
+            if (sectionId === 'manageProducts') loadAdminProducts();
+            if (sectionId === 'manageReviews') loadAdminReviews();
+            if (sectionId === 'manageCodes') loadProductCodes();
+            if (sectionId === 'manageOrders') {
+                switchOrdersTab('new');
+                loadOrders('new');
+            }
+            if (sectionId === 'viewSuggestions') loadSuggestions();
+            if (sectionId === 'adminChat') loadChat();
+        }
+
+        // Инициализация при загрузке
+        calculateRobuxPrice();
+        showNotification('NormiShop успешно загружен! 🎉');
+    </script>
+</body>
+</html>
