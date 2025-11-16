@@ -410,7 +410,7 @@
             border-radius: 16px;
             padding: 16px;
             margin: 10px 0;
-            max-height: 300px;
+            max-height: 400px;
             overflow-y: auto;
             border: 1px solid rgba(255,255,255,0.1);
         }
@@ -443,8 +443,34 @@
             margin: 10px auto;
             text-align: center;
             font-size: 12px;
-            max-width: 70%;
+            max-width: 90%;
+            border-radius: 12px;
+            padding: 10px;
         }
+
+        .message-order {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--success);
+            margin: 10px auto;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        /* Order Status */
+        .order-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .status-new { background: var(--warning); color: #000; }
+        .status-process { background: var(--primary); color: white; }
+        .status-completed { background: var(--success); color: white; }
+        .status-cancelled { background: var(--danger); color: white; }
 
         /* Tabs */
         .tabs {
@@ -500,6 +526,23 @@
         .admin-floating-btn:hover {
             transform: scale(1.1);
         }
+
+        /* Code Items */
+        .code-item {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 8px 0;
+            border-left: 4px solid var(--success);
+        }
+
+        .suggestion-item {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 8px 0;
+            border-left: 4px solid var(--warning);
+        }
     </style>
 </head>
 <body>
@@ -512,6 +555,8 @@
             <strong id="floatingAdminRank"></strong>
         </div>
         <button class="btn btn-warning btn-small" onclick="showSection('manageProducts')">📦 Товары</button>
+        <button class="btn btn-warning btn-small" onclick="showSection('manageOrders')">📋 Заказы</button>
+        <button class="btn btn-warning btn-small" onclick="showSection('manageCodes')">🔑 Коды</button>
         <button class="btn btn-warning btn-small" onclick="showSection('manageReviews')">⭐ Отзывы</button>
         <button class="btn btn-danger btn-small" onclick="exitAdmin()">🚪 Выйти</button>
     </div>
@@ -562,8 +607,10 @@
             <div id="adminPanelMain" class="admin-panel hidden">
                 <h3 style="margin-bottom: 15px;">⚙️ Панель админа (<span id="adminRank"></span>)</h3>
                 <button class="btn btn-warning btn-small" onclick="showSection('manageProducts')">📦 Управление товарами</button>
+                <button class="btn btn-warning btn-small" onclick="showSection('manageOrders')">📋 Управление заказами</button>
+                <button class="btn btn-warning btn-small" onclick="showSection('manageCodes')">🔑 Управление кодами</button>
                 <button class="btn btn-warning btn-small" onclick="showSection('manageReviews')">⭐ Управление отзывами</button>
-                <button class="btn btn-warning btn-small" onclick="showSection('adminChat')">💬 Чат админа</button>
+                <button class="btn btn-warning btn-small" onclick="showSection('viewSuggestions')">💡 Предложения товаров</button>
                 <button class="btn btn-danger btn-small" onclick="exitAdmin()">🚪 Выйти</button>
             </div>
         </div>
@@ -592,7 +639,8 @@
             <div id="adminPanelProducts" class="admin-panel hidden">
                 <h3 style="margin-bottom: 15px;">⚙️ Панель админа (<span id="adminRankProducts"></span>)</h3>
                 <button class="btn btn-warning btn-small" onclick="showSection('manageProducts')">📦 Управление товарами</button>
-                <button class="btn btn-warning btn-small" onclick="showSection('manageReviews')">⭐ Управление отзывами</button>
+                <button class="btn btn-warning btn-small" onclick="showSection('manageOrders')">📋 Управление заказами</button>
+                <button class="btn btn-warning btn-small" onclick="showSection('manageCodes')">🔑 Управление кодами</button>
                 <button class="btn btn-warning btn-small" onclick="showSection('adminChat')">💬 Чат админа</button>
                 <button class="btn btn-danger btn-small" onclick="exitAdmin()">🚪 Выйти</button>
             </div>
@@ -620,7 +668,7 @@
                 </div>
 
                 <div class="calc-result" id="robuxResult">
-                    1000 робуксов = 1000 ₽
+                    1000 робуксов = 870 ₽
                 </div>
 
                 <button class="btn btn-success" onclick="showSection('robuxMeeting')">✅ Продолжить</button>
@@ -654,7 +702,7 @@
 
                 <div class="calc-result">
                     Заказ: <span id="finalRobuxAmount">1000</span> робуксов<br>
-                    Стоимость: <span id="finalRobuxPrice">1000 ₽</span>
+                    Стоимость: <span id="finalRobuxPrice">870 ₽</span>
                 </div>
 
                 <button class="btn btn-success" onclick="completeRobuxOrder()">✅ Подтвердить заказ</button>
@@ -672,6 +720,62 @@
 
             <div class="scroll-container" id="productsContainer">
                 <!-- Товары будут загружены здесь -->
+            </div>
+
+            <button class="btn btn-back" onclick="showSection('products')">← Назад</button>
+        </div>
+
+        <!-- Получить из кода -->
+        <div id="getFromCode" class="section">
+            <div class="header">
+                <h1>🎁 Получить товар по коду</h1>
+                <p>Введите код для получения товара</p>
+            </div>
+
+            <div class="calculator">
+                <div class="input-group">
+                    <label>Код товара:</label>
+                    <input type="text" id="productCodeInput" placeholder="Введите код товара">
+                </div>
+
+                <button class="btn btn-success" onclick="redeemProductCode()">🎁 Получить товар</button>
+            </div>
+
+            <button class="btn btn-back" onclick="showSection('products')">← Назад</button>
+        </div>
+
+        <!-- Предложить товар -->
+        <div id="suggestProduct" class="section">
+            <div class="header">
+                <h1>💡 Предложить товар</h1>
+                <p>Предложите новый товар для магазина</p>
+            </div>
+
+            <div class="calculator">
+                <div class="input-group">
+                    <label>Название товара:</label>
+                    <input type="text" id="suggestedProductName" placeholder="Введите название товара">
+                </div>
+
+                <div class="input-group">
+                    <label>Описание:</label>
+                    <textarea id="suggestedProductDescription" placeholder="Опишите товар..." rows="3"></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label>Предполагаемая цена:</label>
+                    <input type="number" id="suggestedProductPrice" placeholder="Введите цену">
+                </div>
+
+                <div class="input-group">
+                    <label>Валюта:</label>
+                    <select id="suggestedProductCurrency">
+                        <option value="RUB">Рубли (RUB)</option>
+                        <option value="USD">Доллары (USD)</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-success" onclick="submitProductSuggestion()">✅ Отправить предложение</button>
             </div>
 
             <button class="btn btn-back" onclick="showSection('products')">← Назад</button>
@@ -713,6 +817,70 @@
 
             <div class="scroll-container" id="adminProductsContainer">
                 <!-- Товары для управления -->
+            </div>
+
+            <button class="btn btn-back" onclick="showSection('products')">← Назад</button>
+        </div>
+
+        <!-- Управление кодами (Админ) -->
+        <div id="manageCodes" class="section">
+            <div class="header">
+                <h1>🔑 Управление кодами</h1>
+                <p>Создание и просмотр кодов товаров</p>
+            </div>
+
+            <div class="calculator">
+                <div class="input-group">
+                    <label>Выберите товар:</label>
+                    <select id="codeProductSelect">
+                        <!-- Товары будут загружены здесь -->
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Код (оставьте пустым для автогенерации):</label>
+                    <input type="text" id="customCode" placeholder="Например: SUMMER2024">
+                </div>
+
+                <button class="btn btn-success" onclick="generateProductCode()">🔑 Создать код</button>
+            </div>
+
+            <div class="scroll-container" id="codesContainer">
+                <!-- Коды будут загружены здесь -->
+            </div>
+
+            <button class="btn btn-back" onclick="showSection('products')">← Назад</button>
+        </div>
+
+        <!-- Управление заказами (Админ) -->
+        <div id="manageOrders" class="section">
+            <div class="header">
+                <h1>📋 Управление заказами</h1>
+                <p>Просмотр и управление заказами</p>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="switchOrdersTab('new')">Новые</button>
+                <button class="tab" onclick="switchOrdersTab('process')">В процессе</button>
+                <button class="tab" onclick="switchOrdersTab('completed')">Выполненные</button>
+            </div>
+
+            <div class="scroll-container" id="ordersContainer">
+                <!-- Заказы будут загружены здесь -->
+            </div>
+
+            <button class="btn btn-back" onclick="showSection('products')">← Назад</button>
+        </div>
+
+        <!-- Просмотр предложений (Админ) -->
+        <div id="viewSuggestions" class="section">
+            <div class="header">
+                <h1>💡 Предложения товаров</h1>
+                <p>Предложения от пользователей</p>
+            </div>
+
+            <div class="scroll-container" id="suggestionsContainer">
+                <!-- Предложения будут загружены здесь -->
             </div>
 
             <button class="btn btn-back" onclick="showSection('products')">← Назад</button>
@@ -814,6 +982,25 @@
             <button class="btn btn-back" onclick="showSection('mainMenu')">← Назад</button>
         </div>
 
+        <!-- Написать проблему -->
+        <div id="reportProblem" class="section">
+            <div class="header">
+                <h1>📝 Сообщить о проблеме</h1>
+                <p>Опишите вашу проблему</p>
+            </div>
+
+            <div class="calculator">
+                <div class="input-group">
+                    <label>Опишите проблему:</label>
+                    <textarea id="problemDescription" placeholder="Подробно опишите проблему..." rows="4"></textarea>
+                </div>
+
+                <button class="btn btn-success" onclick="submitProblemReport()">✅ Отправить отчет</button>
+            </div>
+
+            <button class="btn btn-back" onclick="showSection('support')">← Назад</button>
+        </div>
+
         <!-- Чат с админом -->
         <div id="adminChat" class="section">
             <div class="header">
@@ -822,9 +1009,7 @@
             </div>
 
             <div class="chat-container" id="chatMessages">
-                <div class="message message-admin">
-                    Здравствуйте! Чем могу помочь?
-                </div>
+                <!-- Сообщения чата -->
             </div>
 
             <div class="input-group">
@@ -850,7 +1035,16 @@
         let products = [];
         let reviews = [];
         let chatMessages = [];
+        let productCodes = [];
+        let orders = [];
+        let suggestions = [];
         let isAdminPanelVisible = false;
+
+        // Курсы валют
+        const EXCHANGE_RATES = {
+            RUB_TO_ROBUX: 1.15, // 1 рубль = 1.15 робукса
+            USD_TO_RUB: 90      // 1 доллар = 90 рублей
+        };
 
         // ==================== ИНИЦИАЛИЗАЦИЯ ====================
         tg.ready();
@@ -882,6 +1076,9 @@
                 currentAdmin = { code, ...adminInfo };
                 showAdminPanels();
                 showNotification(`✅ Успешный вход как ${adminInfo.name}`);
+                
+                // Добавляем системное сообщение в чат
+                addSystemMessage(`Админ ${adminInfo.name} вошел в систему`);
             } else {
                 showNotification('❌ Неверный код админа');
             }
@@ -1049,8 +1246,31 @@
 
         function buyProduct(productId) {
             const product = products.find(p => p.id === productId);
-            showNotification(`🛒 Вы выбрали: ${product.name} за ${product.price} ${product.currency === 'RUB' ? '₽' : '$'}`);
+            if (!product) return;
+            
+            // Создаем заказ
+            const order = {
+                id: Date.now(),
+                type: 'product',
+                productId: product.id,
+                productName: product.name,
+                price: product.price,
+                currency: product.currency,
+                customer: currentUser ? currentUser.first_name : 'Аноним',
+                status: 'new',
+                timestamp: new Date().toLocaleString('ru-RU')
+            };
+            
+            orders.push(order);
+            saveData();
+            
+            // Добавляем уведомление в чат
+            addOrderMessage(order);
+            
+            // Показываем чат с админом
             document.getElementById('adminChatItem').classList.remove('hidden');
+            
+            showNotification(`🛒 Заказ создан! ${product.name} за ${product.price} ${product.currency === 'RUB' ? '₽' : '$'}`);
             showSection('products');
         }
 
@@ -1058,8 +1278,16 @@
         function calculateRobuxPrice() {
             const amount = parseInt(document.getElementById('robuxAmount').value) || 1000;
             const currency = document.getElementById('currencySelect').value;
-            const rate = currency === 'RUB' ? 1 : 90;
-            const price = amount * rate;
+            
+            let price;
+            if (currency === 'RUB') {
+                // 1 рубль = 1.15 робукса, поэтому цена в рублях = количество / 1.15
+                price = Math.round(amount / EXCHANGE_RATES.RUB_TO_ROBUX);
+            } else {
+                // USD: сначала в рубли, потом рассчитываем
+                const priceInRub = Math.round(amount / EXCHANGE_RATES.RUB_TO_ROBUX);
+                price = (priceInRub / EXCHANGE_RATES.USD_TO_RUB).toFixed(2);
+            }
             
             document.getElementById('robuxResult').textContent = 
                 `${amount} робуксов = ${price} ${currency === 'RUB' ? '₽' : '$'}`;
@@ -1072,24 +1300,386 @@
             const place = document.getElementById('meetingPlace').value;
             const date = document.getElementById('meetingDate').value;
             const time = document.getElementById('meetingTime').value;
+            const amount = document.getElementById('finalRobuxAmount').textContent;
+            const price = document.getElementById('finalRobuxPrice').textContent;
             
             if (!place || !date || !time) {
                 showNotification('❌ Заполните все поля');
                 return;
             }
             
+            // Создаем заказ робуксов
+            const order = {
+                id: Date.now(),
+                type: 'robux',
+                amount: parseInt(amount),
+                price: price,
+                place: place,
+                date: date,
+                time: time,
+                customer: currentUser ? currentUser.first_name : 'Аноним',
+                status: 'new',
+                timestamp: new Date().toLocaleString('ru-RU')
+            };
+            
+            orders.push(order);
+            saveData();
+            
+            // Добавляем уведомление в чат
+            addOrderMessage(order);
+            
             document.getElementById('adminChatItem').classList.remove('hidden');
             
-            // Добавляем сообщение в чат о новом заказе
-            const systemMessage = {
-                type: 'system',
-                text: `Новый заказ робуксов! ${document.getElementById('finalRobuxAmount').textContent} робуксов за ${document.getElementById('finalRobuxPrice').textContent}. Место: ${place}, Дата: ${date}, Время: ${time}`
-            };
-            chatMessages.push(systemMessage);
-            saveData();
+            // Очищаем форму
+            document.getElementById('meetingPlace').value = '';
+            document.getElementById('meetingDate').value = '';
+            document.getElementById('meetingTime').value = '';
             
             showNotification('✅ Заказ оформлен! Чат с админом активирован');
             showSection('mainMenu');
+        }
+
+        // ==================== СИСТЕМА КОДОВ ====================
+        function loadProductCodes() {
+            const select = document.getElementById('codeProductSelect');
+            select.innerHTML = '<option value="">Выберите товар</option>';
+            
+            products.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.id;
+                option.textContent = `${product.name} - ${product.price} ${product.currency === 'RUB' ? '₽' : '$'}`;
+                select.appendChild(option);
+            });
+            
+            const container = document.getElementById('codesContainer');
+            container.innerHTML = '';
+            
+            if (productCodes.length === 0) {
+                container.innerHTML = '<div class="product-card"><p>Кодов пока нет</p></div>';
+                return;
+            }
+            
+            productCodes.forEach(code => {
+                const product = products.find(p => p.id === code.productId);
+                if (!product) return;
+                
+                const codeItem = document.createElement('div');
+                codeItem.className = 'code-item';
+                codeItem.innerHTML = `
+                    <div><strong>Код:</strong> ${code.code}</div>
+                    <div><strong>Товар:</strong> ${product.name}</div>
+                    <div><strong>Статус:</strong> ${code.used ? '🟢 Использован' : '🔴 Активен'}</div>
+                    ${code.used ? `<div><strong>Использовал:</strong> ${code.usedBy}</div>` : ''}
+                    <button class="btn btn-danger btn-small" onclick="deleteCode('${code.code}')">🗑️ Удалить</button>
+                `;
+                container.appendChild(codeItem);
+            });
+        }
+
+        function generateProductCode() {
+            const productId = parseInt(document.getElementById('codeProductSelect').value);
+            const customCode = document.getElementById('customCode').value.trim();
+            
+            if (!productId) {
+                showNotification('❌ Выберите товар');
+                return;
+            }
+            
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            
+            let code;
+            if (customCode) {
+                code = customCode.toUpperCase();
+                // Проверяем уникальность кода
+                if (productCodes.find(c => c.code === code)) {
+                    showNotification('❌ Этот код уже существует');
+                    return;
+                }
+            } else {
+                // Генерируем случайный код
+                code = 'CODE' + Math.random().toString(36).substr(2, 8).toUpperCase();
+            }
+            
+            const productCode = {
+                code: code,
+                productId: productId,
+                productName: product.name,
+                createdBy: currentAdmin ? currentAdmin.name : 'Система',
+                used: false,
+                createdAt: new Date().toLocaleString('ru-RU')
+            };
+            
+            productCodes.push(productCode);
+            saveData();
+            loadProductCodes();
+            
+            document.getElementById('customCode').value = '';
+            showNotification(`✅ Код создан: ${code}`);
+        }
+
+        function deleteCode(code) {
+            if (confirm('Удалить этот код?')) {
+                productCodes = productCodes.filter(c => c.code !== code);
+                saveData();
+                loadProductCodes();
+                showNotification('🗑️ Код удален');
+            }
+        }
+
+        function redeemProductCode() {
+            const codeInput = document.getElementById('productCodeInput').value.trim().toUpperCase();
+            
+            if (!codeInput) {
+                showNotification('❌ Введите код');
+                return;
+            }
+            
+            const productCode = productCodes.find(c => c.code === codeInput);
+            
+            if (!productCode) {
+                showNotification('❌ Код не найден');
+                return;
+            }
+            
+            if (productCode.used) {
+                showNotification('❌ Этот код уже использован');
+                return;
+            }
+            
+            // Активируем код
+            productCode.used = true;
+            productCode.usedBy = currentUser ? currentUser.first_name : 'Аноним';
+            productCode.usedAt = new Date().toLocaleString('ru-RU');
+            
+            // Создаем заказ
+            const product = products.find(p => p.id === productCode.productId);
+            const order = {
+                id: Date.now(),
+                type: 'code',
+                productId: product.id,
+                productName: product.name,
+                code: codeInput,
+                customer: currentUser ? currentUser.first_name : 'Аноним',
+                status: 'completed',
+                timestamp: new Date().toLocaleString('ru-RU')
+            };
+            
+            orders.push(order);
+            saveData();
+            
+            // Добавляем уведомление в чат
+            addSystemMessage(`Пользователь ${order.customer} использовал код ${codeInput} и получил товар: ${product.name}`);
+            
+            showNotification(`🎁 Поздравляем! Вы получили: ${product.name}`);
+            document.getElementById('productCodeInput').value = '';
+        }
+
+        // ==================== СИСТЕМА ПРЕДЛОЖЕНИЙ ====================
+        function submitProductSuggestion() {
+            const name = document.getElementById('suggestedProductName').value;
+            const description = document.getElementById('suggestedProductDescription').value;
+            const price = parseFloat(document.getElementById('suggestedProductPrice').value);
+            const currency = document.getElementById('suggestedProductCurrency').value;
+            
+            if (!name || !description || !price) {
+                showNotification('❌ Заполните все поля');
+                return;
+            }
+            
+            const suggestion = {
+                id: Date.now(),
+                name: name,
+                description: description,
+                price: price,
+                currency: currency,
+                suggestedBy: currentUser ? currentUser.first_name : 'Аноним',
+                status: 'new',
+                timestamp: new Date().toLocaleString('ru-RU')
+            };
+            
+            suggestions.push(suggestion);
+            saveData();
+            
+            // Добавляем уведомление в чат для админов
+            addSystemMessage(`Новое предложение товара от ${suggestion.suggestedBy}: ${name} - ${price} ${currency === 'RUB' ? '₽' : '$'}`);
+            
+            // Очищаем форму
+            document.getElementById('suggestedProductName').value = '';
+            document.getElementById('suggestedProductDescription').value = '';
+            document.getElementById('suggestedProductPrice').value = '';
+            
+            showNotification('✅ Предложение отправлено! Спасибо!');
+            showSection('products');
+        }
+
+        function loadSuggestions() {
+            const container = document.getElementById('suggestionsContainer');
+            container.innerHTML = '';
+            
+            if (suggestions.length === 0) {
+                container.innerHTML = '<div class="product-card"><p>Предложений пока нет</p></div>';
+                return;
+            }
+            
+            suggestions.forEach(suggestion => {
+                const suggestionItem = document.createElement('div');
+                suggestionItem.className = 'suggestion-item';
+                suggestionItem.innerHTML = `
+                    <div class="product-title">${suggestion.name}</div>
+                    <div class="product-description">${suggestion.description}</div>
+                    <div class="product-price">${suggestion.price} ${suggestion.currency === 'RUB' ? '₽' : '$'}</div>
+                    <div class="product-meta">
+                        Предложил: ${suggestion.suggestedBy}<br>
+                        Дата: ${suggestion.timestamp}<br>
+                        Статус: ${suggestion.status === 'approved' ? '✅ Одобрено' : suggestion.status === 'rejected' ? '❌ Отклонено' : '🟡 На рассмотрении'}
+                    </div>
+                    ${suggestion.status === 'new' ? `
+                        <button class="btn btn-success btn-small" onclick="approveSuggestion(${suggestion.id})">✅ Одобрить</button>
+                        <button class="btn btn-danger btn-small" onclick="rejectSuggestion(${suggestion.id})">❌ Отклонить</button>
+                    ` : ''}
+                `;
+                container.appendChild(suggestionItem);
+            });
+        }
+
+        function approveSuggestion(suggestionId) {
+            const suggestion = suggestions.find(s => s.id === suggestionId);
+            if (!suggestion) return;
+            
+            // Создаем товар из предложения
+            const product = {
+                id: Date.now(),
+                name: suggestion.name,
+                description: suggestion.description,
+                price: suggestion.price,
+                currency: suggestion.currency,
+                suggestedBy: suggestion.suggestedBy,
+                editedBy: currentAdmin ? currentAdmin.name : 'Система'
+            };
+            
+            products.push(product);
+            suggestion.status = 'approved';
+            saveData();
+            
+            showNotification('✅ Предложение одобрено и товар добавлен!');
+            loadSuggestions();
+        }
+
+        function rejectSuggestion(suggestionId) {
+            const suggestion = suggestions.find(s => s.id === suggestionId);
+            if (!suggestion) return;
+            
+            suggestion.status = 'rejected';
+            saveData();
+            
+            showNotification('❌ Предложение отклонено');
+            loadSuggestions();
+        }
+
+        // ==================== СИСТЕМА ЗАКАЗОВ ====================
+        function switchOrdersTab(tab) {
+            // Активируем вкладку
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            loadOrders(tab);
+        }
+
+        function loadOrders(status = 'new') {
+            const container = document.getElementById('ordersContainer');
+            container.innerHTML = '';
+            
+            const filteredOrders = orders.filter(order => {
+                if (status === 'new') return order.status === 'new';
+                if (status === 'process') return order.status === 'process';
+                if (status === 'completed') return order.status === 'completed';
+                return true;
+            });
+            
+            if (filteredOrders.length === 0) {
+                container.innerHTML = '<div class="product-card"><p>Заказов нет</p></div>';
+                return;
+            }
+            
+            filteredOrders.forEach(order => {
+                const orderCard = document.createElement('div');
+                orderCard.className = 'product-card';
+                
+                let orderContent = '';
+                
+                if (order.type === 'robux') {
+                    orderContent = `
+                        <div class="product-title">💰 Заказ робуксов</div>
+                        <div class="product-description">
+                            Количество: ${order.amount} робуксов<br>
+                            Стоимость: ${order.price}<br>
+                            Место: ${order.place}<br>
+                            Дата: ${order.date} ${order.time}
+                        </div>
+                    `;
+                } else if (order.type === 'product') {
+                    const product = products.find(p => p.id === order.productId);
+                    orderContent = `
+                        <div class="product-title">📦 Заказ товара</div>
+                        <div class="product-description">
+                            Товар: ${product ? product.name : order.productName}<br>
+                            Стоимость: ${order.price} ${order.currency === 'RUB' ? '₽' : '$'}
+                        </div>
+                    `;
+                } else if (order.type === 'code') {
+                    orderContent = `
+                        <div class="product-title">🎁 Выдача по коду</div>
+                        <div class="product-description">
+                            Товар: ${order.productName}<br>
+                            Код: ${order.code}
+                        </div>
+                    `;
+                }
+                
+                orderCard.innerHTML = orderContent + `
+                    <div class="product-meta">
+                        Клиент: ${order.customer}<br>
+                        Дата: ${order.timestamp}<br>
+                        Статус: <span class="order-status status-${order.status}">${
+                            order.status === 'new' ? 'Новый' : 
+                            order.status === 'process' ? 'В процессе' : 
+                            order.status === 'completed' ? 'Выполнен' : 
+                            'Отменен'
+                        }</span>
+                    </div>
+                    ${order.status === 'new' ? `
+                        <button class="btn btn-warning btn-small" onclick="updateOrderStatus(${order.id}, 'process')">🔄 В процесс</button>
+                        <button class="btn btn-success btn-small" onclick="updateOrderStatus(${order.id}, 'completed')">✅ Выполнить</button>
+                    ` : ''}
+                    ${order.status === 'process' ? `
+                        <button class="btn btn-success btn-small" onclick="updateOrderStatus(${order.id}, 'completed')">✅ Выполнить</button>
+                        <button class="btn btn-danger btn-small" onclick="updateOrderStatus(${order.id}, 'cancelled')">❌ Отменить</button>
+                    ` : ''}
+                `;
+                
+                container.appendChild(orderCard);
+            });
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            order.status = newStatus;
+            order.updatedBy = currentAdmin ? currentAdmin.name : 'Система';
+            order.updatedAt = new Date().toLocaleString('ru-RU');
+            saveData();
+            
+            // Добавляем уведомление в чат
+            addSystemMessage(`Статус заказа #${orderId} изменен на: ${
+                newStatus === 'process' ? 'В процессе' : 
+                newStatus === 'completed' ? 'Выполнен' : 
+                'Отменен'
+            }`);
+            
+            showNotification(`✅ Статус заказа обновлен`);
+            loadOrders();
         }
 
         // ==================== СИСТЕМА ОТЗЫВОВ ====================
@@ -1107,12 +1697,17 @@
                 author: currentUser ? currentUser.first_name : 'Аноним',
                 text: text,
                 rating: parseInt(rating),
-                date: new Date().toLocaleDateString('ru-RU')
+                date: new Date().toLocaleDateString('ru-RU'),
+                timestamp: new Date().toLocaleString('ru-RU')
             };
             
             reviews.push(review);
             saveData();
-            showNotification('✅ Отзыв отправлен!');
+            
+            // Добавляем уведомление в чат
+            addSystemMessage(`Новый отзыв от ${review.author}: ${'⭐'.repeat(review.rating)}`);
+            
+            showNotification('✅ Отзыв отправлен! Спасибо!');
             showSection('reviewsMain');
         }
 
@@ -1134,7 +1729,7 @@
                         <span style="color: gold;">${'⭐'.repeat(review.rating)}</span>
                     </div>
                     <div class="review-text">${review.text}</div>
-                    <div class="review-date">${review.date}</div>
+                    <div class="review-date">${review.timestamp}</div>
                     ${currentAdmin ? `<button class="btn btn-danger btn-small" onclick="deleteReview(${review.id})">🗑️ Удалить</button>` : ''}
                 `;
                 container.appendChild(reviewCard);
@@ -1159,7 +1754,7 @@
                         <span style="color: gold;">${'⭐'.repeat(review.rating)}</span>
                     </div>
                     <div class="review-text">${review.text}</div>
-                    <div class="review-date">${review.date}</div>
+                    <div class="review-date">${review.timestamp}</div>
                     <button class="btn btn-danger btn-small" onclick="deleteReview(${review.id})">🗑️ Удалить</button>
                 `;
                 container.appendChild(reviewCard);
@@ -1186,6 +1781,38 @@
                 if (msg.type === 'system') {
                     messageDiv.className = 'message message-system';
                     messageDiv.textContent = msg.text;
+                } else if (msg.type === 'order') {
+                    messageDiv.className = 'message message-order';
+                    
+                    let orderContent = '';
+                    if (msg.order.type === 'robux') {
+                        orderContent = `
+                            🎯 НОВЫЙ ЗАКАЗ РОБУКСОВ\n
+                            👤 Клиент: ${msg.order.customer}\n
+                            💰 ${msg.order.amount} робуксов за ${msg.order.price}\n
+                            📍 Место: ${msg.order.place}\n
+                            📅 ${msg.order.date} ${msg.order.time}\n
+                            ⏰ ${msg.order.timestamp}
+                        `;
+                    } else if (msg.order.type === 'product') {
+                        orderContent = `
+                            🎯 НОВЫЙ ЗАКАЗ ТОВАРА\n
+                            👤 Клиент: ${msg.order.customer}\n
+                            📦 Товар: ${msg.order.productName}\n
+                            💰 Цена: ${msg.order.price} ${msg.order.currency === 'RUB' ? '₽' : '$'}\n
+                            ⏰ ${msg.order.timestamp}
+                        `;
+                    } else if (msg.order.type === 'code') {
+                        orderContent = `
+                            🎁 ВЫДАЧА ПО КОДУ\n
+                            👤 Клиент: ${msg.order.customer}\n
+                            📦 Товар: ${msg.order.productName}\n
+                            🔑 Код: ${msg.order.code}\n
+                            ⏰ ${msg.order.timestamp}
+                        `;
+                    }
+                    
+                    messageDiv.innerHTML = orderContent.replace(/\n/g, '<br>');
                 } else if (msg.sender === 'admin') {
                     messageDiv.className = 'message message-admin';
                     messageDiv.textContent = `👑 Админ: ${msg.text}`;
@@ -1197,6 +1824,30 @@
             });
             
             container.scrollTop = container.scrollHeight;
+        }
+
+        function addSystemMessage(text) {
+            const systemMessage = {
+                type: 'system',
+                text: text,
+                timestamp: new Date().toLocaleString('ru-RU')
+            };
+            
+            chatMessages.push(systemMessage);
+            saveData();
+            loadChat();
+        }
+
+        function addOrderMessage(order) {
+            const orderMessage = {
+                type: 'order',
+                order: order,
+                timestamp: new Date().toLocaleString('ru-RU')
+            };
+            
+            chatMessages.push(orderMessage);
+            saveData();
+            loadChat();
         }
 
         function sendChatMessage() {
@@ -1214,27 +1865,6 @@
             loadChat();
             
             document.getElementById('chatMessage').value = '';
-            
-            // Авто-ответ админа
-            setTimeout(() => {
-                const responses = [
-                    'Спасибо за сообщение! Ответим в ближайшее время.',
-                    'Понял ваш запрос, обрабатываем.',
-                    'Информация принята, скоро свяжемся.',
-                    'Благодарим за обращение!'
-                ];
-                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-                
-                const adminResponse = {
-                    text: randomResponse,
-                    sender: 'admin',
-                    timestamp: new Date().toLocaleTimeString('ru-RU')
-                };
-                
-                chatMessages.push(adminResponse);
-                saveData();
-                loadChat();
-            }, 2000);
         }
 
         function sendAdminChatMessage() {
@@ -1254,6 +1884,23 @@
             document.getElementById('chatMessage').value = '';
         }
 
+        // ==================== СИСТЕМА ПОДДЕРЖКИ ====================
+        function submitProblemReport() {
+            const problem = document.getElementById('problemDescription').value;
+            
+            if (!problem) {
+                showNotification('❌ Опишите проблему');
+                return;
+            }
+            
+            // Добавляем уведомление в чат
+            addSystemMessage(`🚨 СООБЩЕНИЕ О ПРОБЛЕМЕ от ${currentUser ? currentUser.first_name : 'Аноним'}:\n${problem}`);
+            
+            document.getElementById('problemDescription').value = '';
+            showNotification('✅ Сообщение о проблеме отправлено! Мы скоро свяжемся.');
+            showSection('support');
+        }
+
         // ==================== УТИЛИТЫ ====================
         function showSection(sectionId) {
             document.querySelectorAll('.section').forEach(section => {
@@ -1267,6 +1914,12 @@
             if (sectionId === 'productsList') showProducts();
             if (sectionId === 'manageProducts') loadAdminProducts();
             if (sectionId === 'manageReviews') loadAdminReviews();
+            if (sectionId === 'manageCodes') loadProductCodes();
+            if (sectionId === 'manageOrders') {
+                switchOrdersTab('new');
+                loadOrders('new');
+            }
+            if (sectionId === 'viewSuggestions') loadSuggestions();
             if (sectionId === 'adminChat') loadChat();
             
             // Скрываем плавающую панель при смене раздела
@@ -1292,85 +1945,4 @@
             }
         }
 
-        function showShopInfo() {
-            showNotification('🏪 NormiShop\n🌟 Лучший магазин робуксов и товаров\n📞 Поддержка 24/7\n⭐ Более 1000 довольных клиентов');
-        }
-
-        function saveData() {
-            localStorage.setItem('normishop_products', JSON.stringify(products));
-            localStorage.setItem('normishop_reviews', JSON.stringify(reviews));
-            localStorage.setItem('normishop_chat', JSON.stringify(chatMessages));
-        }
-
-        function loadData() {
-            const savedProducts = localStorage.getItem('normishop_products');
-            const savedReviews = localStorage.getItem('normishop_reviews');
-            const savedChat = localStorage.getItem('normishop_chat');
-            
-            products = savedProducts ? JSON.parse(savedProducts) : [];
-            reviews = savedReviews ? JSON.parse(savedReviews) : [];
-            chatMessages = savedChat ? JSON.parse(savedChat) : [
-                { type: 'system', text: 'Добро пожаловать в чат поддержки!' },
-                { sender: 'admin', text: 'Здравствуйте! Чем могу помочь?' }
-            ];
-        }
-
-        // ==================== ЗАГЛУШКИ ДЛЯ НЕРЕАЛИЗОВАННЫХ ФУНКЦИЙ ====================
-        function showSection(sectionId) {
-            const sections = {
-                'getFromCode': '🎁 Получить из кода',
-                'suggestProduct': '💡 Предложить товар',
-                'reportProblem': '📝 Написать проблему',
-                'supportChats': '💬 Прошлые чаты',
-                'enterProductCode': '🔢 Ввести код товара'
-            };
-            
-            if (sections[sectionId]) {
-                showNotification(`${sections[sectionId]} - скоро будет доступно`);
-                return;
-            }
-            
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active');
-            });
-            document.getElementById(sectionId).classList.add('active');
-            
-            if (sectionId === 'viewReviews') loadReviews();
-            if (sectionId === 'buyRobux') calculateRobuxPrice();
-            if (sectionId === 'productsList') showProducts();
-            if (sectionId === 'manageProducts') loadAdminProducts();
-            if (sectionId === 'manageReviews') loadAdminReviews();
-            if (sectionId === 'adminChat') loadChat();
-        }
-
-        // Инициализация при загрузке
-        calculateRobuxPrice();
-        showNotification('NormiShop успешно загружен! 🎉');
-
-        // Добавляем демо данные если пусто
-        if (products.length === 0) {
-            products = [
-                {
-                    id: 1,
-                    name: 'Roblox Premium',
-                    description: 'Премиум подписка на 1 месяц',
-                    price: 299,
-                    currency: 'RUB',
-                    suggestedBy: 'Нормилист',
-                    editedBy: 'Нормилист'
-                },
-                {
-                    id: 2,
-                    name: '1000 Robux',
-                    description: 'Игровая валюта для Roblox',
-                    price: 1000,
-                    currency: 'RUB',
-                    suggestedBy: 'Нормилист',
-                    editedBy: 'Нормилист'
-                }
-            ];
-            saveData();
-        }
-    </script>
-</body>
-</html>
+        function showShopInfo
