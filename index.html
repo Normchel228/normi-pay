@@ -3,53 +3,991 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Магазин - Главная</title>
+    <title>NormiShop - Магазин</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a6fd8;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --gray: #6b7280;
+            --light: #f8fafc;
+            --dark: #1f2937;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        /* Menu Grid */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .menu-item {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 24px 20px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border: 2px solid transparent;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .menu-item:hover::before {
+            left: 100%;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border-color: rgba(255,255,255,0.8);
+        }
+
+        .menu-icon {
+            font-size: 28px;
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .menu-item:hover .menu-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .menu-text {
+            flex: 1;
+        }
+
+        .menu-text h3 {
+            font-size: 18px;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .menu-text p {
+            font-size: 14px;
+            color: var(--gray);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:hover .menu-text p {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Colors */
+        .products { background: linear-gradient(135deg, #ff6b6b, #ee5a52); color: white; }
+        .communication { background: linear-gradient(135deg, #4ecdc4, #44a8a1); color: white; }
+        .support { background: linear-gradient(135deg, #45b7d1, #3da5bc); color: white; }
+        .admin-chat { background: linear-gradient(135deg, #96ceb4, #85baa1); color: white; }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin: 8px 0;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, var(--gray), #5a6268);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #0da271);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning), #d97706);
+        }
+
+        .btn-small {
+            padding: 10px 16px;
+            font-size: 14px;
+            margin: 4px 0;
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Product Cards */
+        .product-card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 18px;
+            padding: 20px;
+            margin: 12px 0;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+        }
+
+        .product-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .product-description {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .product-price {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--success);
+            margin: 12px 0;
+        }
+
+        .product-meta {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+
+        /* Admin Ranks */
+        .admin-rank {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-left: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .rank-normilist { background: linear-gradient(135deg, #ffd700, #e6c200); color: #000; }
+        .rank-senior { background: linear-gradient(135deg, #c0c0c0, #a8a8a8); color: #000; }
+        .rank-junior { background: linear-gradient(135deg, #cd7f32, #b3692a); color: #000; }
+
+        /* Forms */
+        .input-group {
+            margin: 16px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: white;
+            font-size: 14px;
+        }
+
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* Calculator */
+        .calculator {
+            background: rgba(255,255,255,0.95);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+
+        .calc-result {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--success);
+            margin: 16px 0;
+            padding: 16px;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 12px;
+        }
+
+        /* Review Cards */
+        .review-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 16px;
+            padding: 16px;
+            margin: 10px 0;
+            border-left: 4px solid var(--primary);
+        }
+
+        .review-author {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .review-text {
+            color: var(--gray);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .review-date {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 8px;
+            text-align: right;
+        }
+
+        /* Chat Bubbles */
+        .chat-container {
+            background: rgba(255,255,255,0.95);
+            border-radius: 16px;
+            padding: 16px;
+            margin: 10px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 12px;
+            max-width: 80%;
+        }
+
+        .message-user {
+            background: var(--primary);
+            color: white;
+            margin-left: auto;
+        }
+
+        .message-admin {
+            background: var(--gray);
+            color: white;
+            margin-right: auto;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 4px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: transparent;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: rgba(255,255,255,0.2);
+            font-weight: 600;
+        }
+
+        /* Scrollable container */
+        .scroll-container {
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 16px 0;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1 id="greeting">Добро пожаловать! 👋</h1>
-            <p>Выберите раздел</p>
+        <!-- Главное меню -->
+        <div id="mainMenu" class="section active">
+            <div class="header">
+                <h1 id="greeting">NormiShop 🛍️</h1>
+                <p>Выберите раздел</p>
+            </div>
+
+            <div class="menu-grid">
+                <div class="menu-item" onclick="showSection('products')">
+                    <div class="menu-icon products">🛍️</div>
+                    <div class="menu-text">
+                        <h3>Товары</h3>
+                        <p>Покупка робуксов и товаров</p>
+                    </div>
+                </div>
+
+                <div class="menu-item" onclick="showSection('communication')">
+                    <div class="menu-icon communication">💻</div>
+                    <div class="menu-text">
+                        <h3>Коммуникации</h3>
+                        <p>Отзывы и информация</p>
+                    </div>
+                </div>
+
+                <div class="menu-item" onclick="showSection('support')">
+                    <div class="menu-icon support">❓</div>
+                    <div class="menu-text">
+                        <h3>Поддержка</h3>
+                        <p>Помощь и консультация</p>
+                    </div>
+                </div>
+                
+                <div class="menu-item hidden" id="adminChatItem" onclick="showSection('adminChat')">
+                    <div class="menu-icon admin-chat">💬</div>
+                    <div class="menu-text">
+                        <h3>Чат с админом</h3>
+                        <p>Обсуждение заказа</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="menu-grid">
-            <div class="menu-item" onclick="openSection('products')">
-                <div class="menu-icon products">🛍️</div>
-                <div class="menu-text">
-                    <h3>Товары</h3>
-                    <p>Покупка робуксов и товаров</p>
-                </div>
+        <!-- Раздел Товары -->
+        <div id="products" class="section">
+            <div class="header">
+                <h1>🛍️ Товары</h1>
+                <p>Выберите действие</p>
             </div>
 
-            <div class="menu-item" onclick="openSection('communication')">
-                <div class="menu-icon communication">💻</div>
-                <div class="menu-text">
-                    <h3>Коммуникации</h3>
-                    <p>Отзывы и информация</p>
-                </div>
-            </div>
-
-            <div class="menu-item" onclick="openSection('support')">
-                <div class="menu-icon support">❓</div>
-                <div class="menu-text">
-                    <h3>Поддержка</h3>
-                    <p>Помощь и консультация</p>
-                </div>
+            <button class="btn" onclick="showSection('buyRobux')">💰 Купить робуксы</button>
+            <button class="btn" onclick="showProducts()">📦 Купить товар</button>
+            <button class="btn" onclick="showSection('getFromCode')">🎁 Получить из кода</button>
+            <button class="btn" onclick="showSection('suggestProduct')">💡 Предложить товар</button>
+            
+            <div class="input-group">
+                <input type="text" id="adminCodeInput" placeholder="Введите код админа (опционально)" style="background: white;">
             </div>
             
-            <!-- Чат с админом (будет появляться после оформления заказа) -->
-            <div class="menu-item hidden" id="adminChatItem" onclick="openAdminChat()">
-                <div class="menu-icon admin-chat">💬</div>
-                <div class="menu-text">
-                    <h3>Чат с админом</h3>
-                    <p>Обсуждение заказа</p>
-                </div>
+            <button class="btn btn-warning" onclick="checkAdminAccess()">⚡ Войти как админ</button>
+            <button class="btn btn-back" onclick="showSection('mainMenu')">← Назад</button>
+
+            <!-- Админ панель -->
+            <div id="adminPanel" class="admin-panel hidden">
+                <h3 style="color: white; margin-bottom: 15px;">⚙️ Панель админа (<span id="adminRank"></span>)</h3>
+                <button class="btn btn-warning btn-small" onclick="showSection('manageProducts')">📦 Управление товарами</button>
+                <button class="btn btn-warning btn-small" onclick="showSection('manageCodes')">🔑 Управление кодами</button>
+                <button class="btn btn-warning btn-small" onclick="showSection('manageReviews')">⭐ Управление отзывами</button>
+                <button class="btn btn-danger btn-small" onclick="exitAdmin()">🚪 Выйти</button>
             </div>
         </div>
+
+        <!-- Купить робуксы -->
+        <div id="buyRobux" class="section">
+            <div class="header">
+                <h1>💰 Калькулятор робуксов</h1>
+                <p>Рассчитайте стоимость</p>
+            </div>
+
+            <div class="calculator">
+                <div class="input-group">
+                    <label>Количество робуксов:</label>
+                    <input type="number" id="robuxAmount" placeholder="Введите количество" min="100" value="1000" oninput="calculateRobuxPrice()">
+                </div>
+                
+                <div class="input-group">
+                    <label>Валюта:</label>
+                    <select id="currencySelect" onchange="calculateRobuxPrice()">
+                        <option value="RUB">Рубли (RUB)</option>
+                        <option value="USD">Доллары (USD)</option>
+                    </select>
+                </div>
+
+                <div class="calc-result" id="robuxResult">
+                    1000 робуксов = 1000 ₽
+                </div>
+
+                <button class="btn btn-success" onclick="showSection('robuxMeeting')">✅ Продолжить</button>
+            </div>
+
+            <button class="btn btn-back" onclick="showSection('products')">← Назад</button>
+        </div>
+
+        <!-- Встреча для робуксов -->
+        <div id="robuxMeeting" class="section">
+            <div class="header">
+                <h1>📅 Данные для встречи</h1>
+                <p>Заполните информацию</p>
+            </div>
+
+            <div class="calculator">
+                <div class="input-group">
+                    <label>Место встречи:</label>
+                    <input type="text" id="meetingPlace" placeholder="Например: ТРЦ Европейский">
+                </div>
+
+                <div class="input-group">
+                    <label>Дата:</label>
+                    <input type="date" id="meetingDate">
+                </div>
+
+                <div class="input-group">
+                    <label>Время:</label>
+                    <input type="time" id="meetingTime">
+                </div>
+
+                <div class="calc-result">
+                    Заказ: <span id="finalRobuxAmount">1000</span> робуксов<br>
+                    Стоимость: <span id="finalRobuxPrice">1000 ₽</span>
+                </div>
+
+                <button class="btn btn-success" onclick="completeRobuxOrder()">✅ Подтвердить заказ</button>
+            </div>
+
+            <button class="btn btn-back" onclick="showSection('buyRobux')">← Назад</button>
+        </div>
+
+        <!-- Список товаров -->
+        <div id="productsList" class="section">
+            <div class="header">
+                <h1>📦 Каталог товаров</h1>
+                <p>Выберите товар</p>
+            </div>
+
+            <div class="scroll-container" id="productsContainer">
+                <!-- Товары будут загружены здесь -->
+            </div>
+
+            <button class="btn btn-back" onclick="showSection('products')">← Назад</button>
+        </div>
+
+        <!-- Коммуникации -->
+        <div id="communication" class="section">
+            <div class="header">
+                <h1>💻 Коммуникации</h1>
+                <p>Информация и отзывы</p>
+            </div>
+
+            <button class="btn" onclick="showSection('userInfo')">👤 О пользователе</button>
+            <button class="btn" onclick="showSection('shopInfo')">🏪 О магазине</button>
+            <button class="btn" onclick="showSection('actions')">⚡ Действия</button>
+            <button class="btn" onclick="showSection('reviewsMain')">⭐ Отзывы</button>
+            <button class="btn btn-back" onclick="showSection('mainMenu')">← Назад</button>
+        </div>
+
+        <!-- Отзывы -->
+        <div id="reviewsMain" class="section">
+            <div class="header">
+                <h1>⭐ Отзывы</h1>
+                <p>Управление отзывами</p>
+            </div>
+
+            <button class="btn" onclick="showSection('writeReview')">✍️ Написать отзыв</button>
+            <button class="btn" onclick="showSection('viewReviews')">👀 Посмотреть отзывы</button>
+            <button class="btn btn-back" onclick="showSection('communication')">← Назад</button>
+        </div>
+
+        <!-- Написать отзыв -->
+        <div id="writeReview" class="section">
+            <div class="header">
+                <h1>✍️ Написать отзыв</h1>
+                <p>Поделитесь впечатлениями</p>
+            </div>
+
+            <div class="calculator">
+                <div class="input-group">
+                    <label>Ваш отзыв:</label>
+                    <textarea id="reviewText" placeholder="Расскажите о вашем опыте..." rows="4"></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label>Оценка:</label>
+                    <select id="reviewRating">
+                        <option value="5">⭐⭐⭐⭐⭐ Отлично</option>
+                        <option value="4">⭐⭐⭐⭐ Хорошо</option>
+                        <option value="3">⭐⭐⭐ Нормально</option>
+                        <option value="2">⭐⭐ Плохо</option>
+                        <option value="1">⭐ Ужасно</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-success" onclick="submitReview()">✅ Отправить отзыв</button>
+            </div>
+
+            <button class="btn btn-back" onclick="showSection('reviewsMain')">← Назад</button>
+        </div>
+
+        <!-- Просмотр отзывов -->
+        <div id="viewReviews" class="section">
+            <div class="header">
+                <h1>👀 Все отзывы</h1>
+                <p>Отзывы покупателей</p>
+            </div>
+
+            <div class="scroll-container" id="reviewsContainer">
+                <!-- Отзывы будут загружены здесь -->
+            </div>
+
+            <button class="btn btn-back" onclick="showSection('reviewsMain')">← Назад</button>
+        </div>
+
+        <!-- Поддержка -->
+        <div id="support" class="section">
+            <div class="header">
+                <h1>❓ Поддержка</h1>
+                <p>Помощь и консультация</p>
+            </div>
+
+            <button class="btn" onclick="showSection('reportProblem')">📝 Написать проблему</button>
+            <button class="btn" onclick="showSection('supportChats')">💬 Прошлые чаты</button>
+            <button class="btn" onclick="showSection('enterProductCode')">🔢 Ввести код товара</button>
+            <button class="btn btn-back" onclick="showSection('mainMenu')">← Назад</button>
+        </div>
+
+        <!-- Чат с админом -->
+        <div id="adminChat" class="section">
+            <div class="header">
+                <h1>💬 Чат с админом</h1>
+                <p>Обсуждение заказа</p>
+            </div>
+
+            <div class="chat-container" id="chatMessages">
+                <div class="message message-admin">
+                    Здравствуйте! Чем могу помочь?
+                </div>
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="chatMessage" placeholder="Введите сообщение...">
+            </div>
+
+            <button class="btn" onclick="sendChatMessage()">📤 Отправить</button>
+            <button class="btn btn-back" onclick="showSection('mainMenu')">← Назад</button>
+        </div>
+
+        <!-- Еще больше разделов... -->
     </div>
 
-    <script src="app.js"></script>
+    <script>
+        // ==================== ОСНОВНЫЕ ПЕРЕМЕННЫЕ ====================
+        let tg = Telegram.WebApp;
+        let currentUser = null;
+        let currentAdmin = null;
+        let products = [];
+        let reviews = [];
+        let adminChats = [];
+
+        // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+        tg.ready();
+        tg.expand();
+
+        // Получаем пользователя Telegram
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            currentUser = tg.initDataUnsafe.user;
+            document.getElementById('greeting').textContent = `Привет, ${currentUser.first_name}! 👋`;
+        }
+
+        // Загружаем данные из localStorage
+        loadData();
+
+        // ==================== СИСТЕМА АДМИНОВ ====================
+        const ADMIN_CODES = {
+            'Normiadmin': { rank: 'normilist', name: 'Нормилист', powers: 'full' },
+            'Admin50': { rank: 'senior', name: 'Старший админ', powers: 'high' },
+            'Admin4': { rank: 'junior', name: 'Младший админ', powers: 'medium' }
+        };
+
+        function checkAdminAccess() {
+            const code = document.getElementById('adminCodeInput').value.trim();
+            const adminInfo = ADMIN_CODES[code];
+            
+            if (adminInfo) {
+                currentAdmin = { code, ...adminInfo };
+                document.getElementById('adminPanel').classList.remove('hidden');
+                document.getElementById('adminRank').textContent = adminInfo.name;
+                document.getElementById('adminRank').className = `admin-rank rank-${adminInfo.rank}`;
+                showNotification(`✅ Успешный вход как ${adminInfo.name}`);
+            } else {
+                showNotification('❌ Неверный код админа');
+            }
+        }
+
+        function exitAdmin() {
+            currentAdmin = null;
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('adminCodeInput').value = '';
+            showNotification('🚪 Вы вышли из режима админа');
+        }
+
+        // ==================== СИСТЕМА ТОВАРОВ ====================
+        function showProducts() {
+            const container = document.getElementById('productsContainer');
+            container.innerHTML = '';
+            
+            if (products.length === 0) {
+                container.innerHTML = '<div class="product-card"><p>Товаров пока нет</p></div>';
+                // Добавляем демо товары
+                products = [
+                    {
+                        id: 1,
+                        name: 'Roblox Premium',
+                        description: 'Премиум подписка на 1 месяц',
+                        price: 299,
+                        currency: 'RUB',
+                        suggestedBy: 'Иван',
+                        editedBy: 'Нормилист'
+                    },
+                    {
+                        id: 2,
+                        name: '1000 Robux',
+                        description: 'Игровая валюта для Roblox',
+                        price: 1000,
+                        currency: 'RUB',
+                        suggestedBy: 'Мария',
+                        editedBy: 'Старший админ'
+                    }
+                ];
+                saveData();
+            }
+            
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <div class="product-title">${product.name}</div>
+                    <div class="product-description">${product.description}</div>
+                    <div class="product-price">${product.price} ${product.currency === 'RUB' ? '₽' : '$'}</div>
+                    <div class="product-meta">
+                        Предложил: ${product.suggestedBy}<br>
+                        Редактировал: ${product.editedBy}
+                    </div>
+                    <button class="btn btn-success btn-small" onclick="buyProduct(${product.id})">🛒 Купить</button>
+                    ${currentAdmin ? `<button class="btn btn-warning btn-small" onclick="editProduct(${product.id})">✏️ Редактировать</button>` : ''}
+                `;
+                container.appendChild(productCard);
+            });
+            
+            showSection('productsList');
+        }
+
+        function buyProduct(productId) {
+            const product = products.find(p => p.id === productId);
+            showNotification(`🛒 Вы выбрали: ${product.name} за ${product.price} ${product.currency === 'RUB' ? '₽' : '$'}`);
+            showSection('products');
+        }
+
+        // ==================== СИСТЕМА РОБУКСОВ ====================
+        function calculateRobuxPrice() {
+            const amount = parseInt(document.getElementById('robuxAmount').value) || 1000;
+            const currency = document.getElementById('currencySelect').value;
+            const rate = currency === 'RUB' ? 1 : 90; // 1 USD = 90 RUB
+            const price = amount * rate;
+            
+            document.getElementById('robuxResult').textContent = 
+                `${amount} робуксов = ${price} ${currency === 'RUB' ? '₽' : '$'}`;
+        }
+
+        function completeRobuxOrder() {
+            const place = document.getElementById('meetingPlace').value;
+            const date = document.getElementById('meetingDate').value;
+            const time = document.getElementById('meetingTime').value;
+            
+            if (!place || !date || !time) {
+                showNotification('❌ Заполните все поля');
+                return;
+            }
+            
+            document.getElementById('adminChatItem').classList.remove('hidden');
+            showNotification('✅ Заказ оформлен! Чат с админом активирован');
+            showSection('mainMenu');
+        }
+
+        // ==================== СИСТЕМА ОТЗЫВОВ ====================
+        function submitReview() {
+            const text = document.getElementById('reviewText').value;
+            const rating = document.getElementById('reviewRating').value;
+            
+            if (!text) {
+                showNotification('❌ Напишите текст отзыва');
+                return;
+            }
+            
+            const review = {
+                id: Date.now(),
+                author: currentUser ? currentUser.first_name : 'Аноним',
+                text: text,
+                rating: rating,
+                date: new Date().toLocaleDateString('ru-RU')
+            };
+            
+            reviews.push(review);
+            saveData();
+            showNotification('✅ Отзыв отправлен!');
+            showSection('reviewsMain');
+        }
+
+        function loadReviews() {
+            const container = document.getElementById('reviewsContainer');
+            container.innerHTML = '';
+            
+            if (reviews.length === 0) {
+                container.innerHTML = '<div class="review-card"><p>Отзывов пока нет</p></div>';
+                return;
+            }
+            
+            reviews.forEach(review => {
+                const reviewCard = document.createElement('div');
+                reviewCard.className = 'review-card';
+                reviewCard.innerHTML = `
+                    <div class="review-author">
+                        ${review.author} 
+                        <span style="color: gold;">${'⭐'.repeat(review.rating)}</span>
+                    </div>
+                    <div class="review-text">${review.text}</div>
+                    <div class="review-date">${review.date}</div>
+                    ${currentAdmin ? `<button class="btn btn-danger btn-small" onclick="deleteReview(${review.id})">🗑️ Удалить</button>` : ''}
+                `;
+                container.appendChild(reviewCard);
+            });
+        }
+
+        function deleteReview(reviewId) {
+            reviews = reviews.filter(r => r.id !== reviewId);
+            saveData();
+            loadReviews();
+            showNotification('🗑️ Отзыв удален');
+        }
+
+        // ==================== СИСТЕМА ЧАТА ====================
+        function sendChatMessage() {
+            const message = document.getElementById('chatMessage').value;
+            if (!message) return;
+            
+            const chatContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message message-user';
+            messageDiv.textContent = message;
+            chatContainer.appendChild(messageDiv);
+            
+            document.getElementById('chatMessage').value = '';
+            
+            // Авто-ответ админа
+            setTimeout(() => {
+                const adminResponse = document.createElement('div');
+                adminResponse.className = 'message message-admin';
+                adminResponse.textContent = 'Спасибо за сообщение! Ответим в ближайшее время.';
+                chatContainer.appendChild(adminResponse);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 1000);
+            
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // ==================== УТИЛИТЫ ====================
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Специальные действия при показе секций
+            if (sectionId === 'viewReviews') loadReviews();
+            if (sectionId === 'buyRobux') calculateRobuxPrice();
+        }
+
+        function showNotification(message) {
+            if (tg.showAlert) {
+                tg.showAlert(message);
+            } else {
+                alert(message);
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('normishop_products', JSON.stringify(products));
+            localStorage.setItem('normishop_reviews', JSON.stringify(reviews));
+        }
+
+        function loadData() {
+            const savedProducts = localStorage.getItem('normishop_products');
+            const savedReviews = localStorage.getItem('normishop_reviews');
+            
+            products = savedProducts ? JSON.parse(savedProducts) : [];
+            reviews = savedReviews ? JSON.parse(savedReviews) : [];
+        }
+
+        // ==================== ЗАГЛУШКИ ДЛЯ НЕРЕАЛИЗОВАННЫХ ФУНКЦИЙ ====================
+        function showSection(sectionId) {
+            const sections = {
+                'userInfo': '👤 Информация о пользователе',
+                'shopInfo': '🏪 Информация о магазине', 
+                'actions': '⚡ Действия',
+                'getFromCode': '🎁 Получить из кода',
+                'suggestProduct': '💡 Предложить товар',
+                'manageProducts': '📦 Управление товарами',
+                'manageCodes': '🔑 Управление кодами',
+                'manageReviews': '⭐ Управление отзывами',
+                'reportProblem': '📝 Написать проблему',
+                'supportChats': '💬 Прошлые чаты',
+                'enterProductCode': '🔢 Ввести код товара'
+            };
+            
+            if (sections[sectionId]) {
+                showNotification(`${sections[sectionId]} - скоро будет доступно`);
+                return;
+            }
+            
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            
+            if (sectionId === 'viewReviews') loadReviews();
+            if (sectionId === 'buyRobux') calculateRobuxPrice();
+            if (sectionId === 'productsList') showProducts();
+        }
+
+        // Инициализация при загрузке
+        calculateRobuxPrice();
+        showNotification('NormiShop успешно загружен! 🎉');
+    </script>
 </body>
 </html>
